@@ -1,39 +1,50 @@
+import "allotment/dist/style.css";
+import Box from "@mui/material/Box";
+import { Allotment } from "allotment";
 import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "../../../../../vite.svg";
-import "./App.css";
+import IpList, { WrapperIP } from "./components/IpList";
+import { uuid } from "./utils/uuid";
+import { IP } from "@src/utils/ip";
+import ClassifiedIP from "./components/ClassifiedIP";
 
 function App() {
-  const [count, setCount] = useState(0);
+	const [list, setList] = useState<WrapperIP[]>([]);
+	const [selectedIp, setSelectedIp] = useState<string | null>(null);
 
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank" rel="noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            setCount((count) => count + 1);
-          }}
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  );
+	function handlerIpAdd(ip: IP) {
+		setList((list) =>
+			list.concat({
+				id: uuid(),
+				ip,
+			})
+		);
+	}
+
+	function handlerSelect(id: string | null) {
+		setSelectedIp((oldId) => (oldId === id ? null : id));
+	}
+
+	return (
+		<Box sx={{ width: "100vw", height: "100vh" }}>
+			<Allotment minSize={300}>
+				<Allotment.Pane preferredSize="30%">
+					<IpList
+						selectedIp={selectedIp}
+						list={list}
+						onIpAdd={handlerIpAdd}
+						onSelect={handlerSelect}
+					/>
+				</Allotment.Pane>
+				<Allotment.Pane preferredSize="70%">
+					<ClassifiedIP
+						selectedIp={selectedIp}
+						list={list}
+						onSelect={handlerSelect}
+					/>
+				</Allotment.Pane>
+			</Allotment>
+		</Box>
+	);
 }
 
 export default App;
