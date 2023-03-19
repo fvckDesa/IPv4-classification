@@ -23,7 +23,7 @@ interface Column {
 
 const columns: readonly Column[] = [
 	{ id: "address", label: "address" },
-	{ id: "subnet mask", label: "subnet mask" },
+	{ id: "subnet mask", label: "subnet mask", minWidth: 125 },
 	{ id: "netId", label: "netId" },
 	{ id: "hostId", label: "hostId" },
 	{ id: "broadcast", label: "broadcast" },

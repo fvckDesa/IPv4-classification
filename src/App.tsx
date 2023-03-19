@@ -20,6 +20,11 @@ function App() {
 		);
 	}
 
+	function handlerDelete(id: string) {
+		setList((list) => list.filter((wrap) => wrap.id !== id));
+		setSelectedIp((prev) => (prev === id ? null : prev));
+	}
+
 	function handlerSelect(id: string | null) {
 		setSelectedIp((oldId) => (oldId === id ? null : id));
 	}
@@ -32,6 +37,7 @@ function App() {
 						selectedIp={selectedIp}
 						list={list}
 						onIpAdd={handlerIpAdd}
+						onDelete={handlerDelete}
 						onSelect={handlerSelect}
 					/>
 				</Allotment.Pane>
