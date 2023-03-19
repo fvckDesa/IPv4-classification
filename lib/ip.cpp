@@ -3,8 +3,18 @@
 #include <array>
 #include <iostream>
 #include <bitset>
+#include <emscripten/emscripten.h>
+#include <emscripten/bind.h>
+
+#ifdef __cplusplus
+#define EXTERN extern "C"
+#else
+#define EXTERN
+#endif
 
 #define IP_LENGTH 4
+
+using namespace emscripten;
 
 using IP_address = std::array<uint8_t, IP_LENGTH>;
 using BinaryAddress = std::array<std::string, IP_LENGTH>;
@@ -22,63 +32,6 @@ struct IP
   BinaryAddress binary;
   ClassType classType;
 };
-
-std::string toString(const IP_address &ip)
-{
-  std::string str;
-  for (int i = 0; i < 4; i++)
-  {
-    str += std::to_string(+ip[i]);
-    if (i < 3)
-    {
-      str += ".";
-    }
-  }
-  return str;
-}
-std::string toString(const BinaryAddress &ip)
-{
-  std::string str;
-  for (int i = 0; i < 4; i++)
-  {
-    str += ip[i];
-    if (i < 3)
-    {
-      str += ".";
-    }
-  }
-  return str;
-}
-
-std::string toString(const ClassType &c)
-{
-  std::string str;
-  switch (c)
-  {
-  case A:
-    str = "A";
-    break;
-  case B:
-    str = "B";
-    break;
-  case C:
-    str = "C";
-    break;
-  }
-  return str;
-}
-
-std::ostream &operator<<(std::ostream &o, const IP &a)
-{
-  o << "address: " << toString(a.address) << std::endl;
-  o << "submask: " << toString(a.submask) << std::endl;
-  o << "netId: " << toString(a.netId) << std::endl;
-  o << "hostId: " << toString(a.hostId) << std::endl;
-  o << "broadcast: " << toString(a.broadcast) << std::endl;
-  o << "binary: " << toString(a.binary) << std::endl;
-  o << "class: " << toString(a.classType) << std::endl;
-  return o;
-}
 
 BinaryAddress addressToBinary(const IP_address &address)
 {
@@ -145,7 +98,7 @@ IP_address getBroadcast(IP_address netId, ClassType type)
   return netId;
 }
 
-IP make_IP(const IP_address &address)
+EXTERN EMSCRIPTEN_KEEPALIVE IP make_IP(const IP_address &address)
 {
   IP newIP;
 
@@ -160,10 +113,33 @@ IP make_IP(const IP_address &address)
   return newIP;
 }
 
-int main()
+EMSCRIPTEN_BINDINGS(my_module)
 {
-  IP_address ip = {192, 168, 1, 1};
-  IP cIp = make_IP(ip);
-  std::cout << cIp << std::endl;
-  return 0;
+  value_array<IP_address>("IP_address")
+      .element(emscripten::index<0>())
+      .element(emscripten::index<1>())
+      .element(emscripten::index<2>())
+      .element(emscripten::index<3>());
+
+  value_array<BinaryAddress>("BinaryAddress")
+      .element(emscripten::index<0>())
+      .element(emscripten::index<1>())
+      .element(emscripten::index<2>())
+      .element(emscripten::index<3>());
+
+  enum_<ClassType>("ClassType")
+      .value("A", A)
+      .value("B", B)
+      .value("C", C);
+
+  value_object<IP>("IP")
+      .field("address", &IP::address)
+      .field("submask", &IP::submask)
+      .field("netId", &IP::netId)
+      .field("hostId", &IP::hostId)
+      .field("broadcast", &IP::broadcast)
+      .field("binary", &IP::binary)
+      .field("classType", &IP::classType);
+
+  function("make_IP", &make_IP);
 }

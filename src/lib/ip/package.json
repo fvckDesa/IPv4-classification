@@ -1,0 +1,4 @@
+{
+	"main": "./ip.js",
+	"types": "./ip.d.ts"
+}

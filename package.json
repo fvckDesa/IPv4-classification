@@ -5,7 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc && vite build",
+		"build:c++": "emcc --bind -s MODULARIZE=1 -s EXPORT_ES6=1 -o ./src/lib/ip.js ./lib/ip.cpp",
+		"build": " tsc && vite build",
 		"preview": "vite preview",
 		"prettier:check": "prettier --check src/**/*.{ts,tsx} --no-error-on-unmatched-pattern",
 		"prettier:fix": "prettier --write src/**/*.{ts,tsx} --ignore-unknown --no-error-on-unmatched-pattern",
@@ -25,6 +26,7 @@
 		"react-transition-group": "^4.4.5"
 	},
 	"devDependencies": {
+		"@types/emscripten": "^1.39.6",
 		"@types/node": "^18.15.3",
 		"@types/react": "^18.0.28",
 		"@types/react-dom": "^18.0.11",
