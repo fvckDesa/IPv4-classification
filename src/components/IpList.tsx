@@ -10,9 +10,11 @@ import Collapse from "@mui/material/Collapse";
 import { TransitionGroup } from "react-transition-group";
 import Queue from "@mui/icons-material/Queue";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 import { useIpField, SubmitIP } from "@src/hooks/useIpField";
 import { IP } from "@src/utils/ip";
-import { MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
+import UploadFile from "./UploadFile";
 
 export interface WrapperIP {
 	id: string;
@@ -29,12 +31,17 @@ interface IIpList {
 
 function IpList({ selectedIp, list, onIpAdd, onSelect, onDelete }: IIpList) {
 	const { error, handlerSubmit, ...input } = useIpField();
+	const [isOpen, setIsOpen] = useState(false);
 
 	function handlerDelete(id: string) {
 		return function (e: MouseEvent) {
 			e.stopPropagation();
 			onDelete(id);
 		};
+	}
+
+	function handlerUpload(ipList: IP[]) {
+		onIpAdd(...ipList);
 	}
 
 	return (
@@ -51,12 +58,21 @@ function IpList({ selectedIp, list, onIpAdd, onSelect, onDelete }: IIpList) {
 				sx={{ display: "flex", width: "100%", px: 2, py: 1 }}
 				onSubmit={handlerSubmit(onIpAdd)}
 			>
+				<IconButton type="button" onClick={() => setIsOpen(true)}>
+					<UploadFileIcon />
+					<UploadFile
+						isOpen={isOpen}
+						onClose={() => setIsOpen(false)}
+						onFileLoad={handlerUpload}
+					/>
+				</IconButton>
 				<TextField
 					size="small"
 					error={error}
 					sx={{
 						width: "80%",
-						mr: "15px",
+						ml: 1,
+						mr: 2,
 					}}
 					placeholder="Insert an ip address"
 					autoComplete="off"

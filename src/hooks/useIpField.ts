@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 import { isIP, IP } from "@src/utils/ip";
 
-export type SubmitIP = (ip: IP) => void;
+export type SubmitIP = (...ipList: IP[]) => void;
 
 export function useIpField() {
 	const [ip, setIp] = useState("");

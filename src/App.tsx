@@ -11,12 +11,14 @@ function App() {
 	const [list, setList] = useState<WrapperIP[]>([]);
 	const [selectedIp, setSelectedIp] = useState<string | null>(null);
 
-	function handlerIpAdd(ip: IP) {
+	function handlerIpAdd(...ipList: IP[]) {
 		setList((list) =>
-			list.concat({
-				id: uuid(),
-				ip,
-			})
+			list.concat(
+				ipList.map((ip) => ({
+					id: uuid(),
+					ip,
+				}))
+			)
 		);
 	}
 

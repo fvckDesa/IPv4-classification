@@ -5,10 +5,9 @@ type ModuleIP = Awaited<ReturnType<typeof Module>>;
 
 export function useIPModule() {
 	const [moduleIP, setModuleIP] = useState<ModuleIP>();
-	const [isLoading, setIsLoading] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		setIsLoading(true);
 		Module()
 			.then(setModuleIP)
 			.finally(() => setIsLoading(false));
