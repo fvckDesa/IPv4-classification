@@ -1,4 +1,9 @@
-import { IP_address, BinaryAddress, ClassType } from "@src/lib/ip/ip";
+import {
+	IP_address,
+	BinaryAddress,
+	ClassType,
+	IP as ClassifiedIP,
+} from "@src/lib/ip/ip";
 
 export type IP = `${number}.${number}.${number}.${number}`;
 
@@ -65,4 +70,85 @@ export async function getListIpFromFile(file: File) {
 export async function findIpFromFiles(files: FileList | null) {
 	if (!files) return [];
 	return Promise.all(Array.from(files).map(getListIpFromFile));
+}
+
+function downloader(file: File) {
+	const a = document.createElement("a");
+	const url = URL.createObjectURL(file);
+	a.href = url;
+	a.download = file.name;
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+type FileType = "text/plane" | "text/csv" | "application/json";
+
+interface DownloadOptions {
+	list: Record<string, ClassifiedIP>;
+	name: string;
+	type: FileType;
+}
+
+export function downloadClassifiedList({ list, name, type }: DownloadOptions) {
+	let content: string;
+	switch (type) {
+		case "text/plane":
+			content = createTxt(list);
+			break;
+		case "text/csv":
+			content = createCSV(list);
+			break;
+		case "application/json":
+			content = createJSON(list);
+			break;
+		default:
+			throw new Error(`File format "${type}" is not supported`);
+	}
+
+	downloader(new File([content], getFileName(name, type), { type }));
+}
+
+function getFileName(name: string, type: FileType) {
+	const extensionMap = {
+		"text/plane": ".txt",
+		"text/csv": ".csv",
+		"application/json": ".json",
+	} satisfies Record<FileType, string>;
+
+	return name + extensionMap[type];
+}
+
+function createTxt(list: Record<string, ClassifiedIP>) {
+	const MAX_LENGTHS = [15, 15, 15, 15, 15, 35, 5];
+	return [
+		"address            submask            netId              hostId             broadcast          binary                                 classType",
+		...Object.values(list).map((classifiedIP) =>
+			Object.values(classifiedIP)
+				.map((prop, idx) => format(prop).padEnd(MAX_LENGTHS[idx], " "))
+				.join("    ")
+		),
+	].join("\n");
+}
+
+function createCSV(list: Record<string, ClassifiedIP>) {
+	return [
+		"address,submask,netId,hostId,broadcast,binary,classType",
+		...Object.values(list).map((classifiedIP) =>
+			Object.values(classifiedIP).map(format).join(",")
+		),
+	].join("\n");
+}
+
+function createJSON(list: Record<string, ClassifiedIP>) {
+	return JSON.stringify(
+		Object.values(list).map((classifiedIP) =>
+			Object.entries(classifiedIP).reduce<Record<string, string>>(
+				(obj, [key, value]) => {
+					obj[key] = format(value);
+					return obj;
+				},
+				{}
+			)
+		)
+	);
 }

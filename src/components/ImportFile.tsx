@@ -11,13 +11,13 @@ import { ChangeEvent, DragEvent, useRef, useState } from "react";
 import FolderIcon from "@src/components/FolderIcon";
 import { toast } from "react-toastify";
 
-interface IUploadFile {
+interface IImportFile {
 	isOpen: boolean;
 	onFileLoad: (ipList: IP[]) => void;
 	onClose: () => void;
 }
 
-function UploadFile({ isOpen, onFileLoad, onClose }: IUploadFile) {
+function ImportFile({ isOpen, onFileLoad, onClose }: IImportFile) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isDragOver, setIsDragOver] = useState(false);
@@ -157,6 +157,7 @@ function UploadFile({ isOpen, onFileLoad, onClose }: IUploadFile) {
 						accept=".txt"
 						multiple
 						hidden
+						autoFocus
 					/>
 				</DialogContent>
 			</Box>
@@ -164,4 +165,4 @@ function UploadFile({ isOpen, onFileLoad, onClose }: IUploadFile) {
 	);
 }
 
-export default UploadFile;
+export default ImportFile;

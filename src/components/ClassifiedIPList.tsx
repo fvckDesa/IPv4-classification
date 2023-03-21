@@ -8,7 +8,7 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { WrapperIP } from "./IpList";
 import { IP_address, IP } from "@src/lib/ip/ip";
-import { useDeferredValue, useEffect, useState } from "react";
+import { useDeferredValue, useEffect } from "react";
 import { format } from "@src/utils/ip";
 import { useIPModule } from "@src/hooks/useIPModule";
 
@@ -36,22 +36,30 @@ const columns: readonly Column[] = [
 	},
 ];
 
-interface IClassifiedIP {
+type ClassifiedList = Record<string, IP>;
+interface IClassifiedIPList {
 	selectedIp: string | null;
 	list: WrapperIP[];
+	classifiedList: ClassifiedList;
 	onSelect: (id: string) => void;
+	onClassifiedListChange: (
+		cb: (oldList: ClassifiedList) => ClassifiedList
+	) => void;
 }
 
-type ClassifiedList = Record<string, IP>;
-
-function ClassifiedIP({ selectedIp, list, onSelect }: IClassifiedIP) {
+function ClassifiedIPList({
+	selectedIp,
+	list,
+	classifiedList,
+	onSelect,
+	onClassifiedListChange,
+}: IClassifiedIPList) {
 	const { isLoading, make_IP } = useIPModule();
-	const [classifiedList, setClassifiedList] = useState<ClassifiedList>({});
 	const deferredList = useDeferredValue(list);
 
 	useEffect(() => {
 		if (isLoading) return;
-		setClassifiedList((prev) =>
+		onClassifiedListChange((prev) =>
 			deferredList.reduce<ClassifiedList>((classifiedList, { id, ip }) => {
 				if (make_IP === undefined) return {};
 				classifiedList[id] =
@@ -119,4 +127,4 @@ function ClassifiedIP({ selectedIp, list, onSelect }: IClassifiedIP) {
 	);
 }
 
-export default ClassifiedIP;
+export default ClassifiedIPList;
